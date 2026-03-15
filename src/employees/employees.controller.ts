@@ -31,10 +31,8 @@ export class EmployeesController {
   }
 
   @Delete(':id')
-  remove(
-    @Param('id', new ParseUUIDPipe({version: '4'})
-    ) id: string) 
-    {
+  remove(@Param('id', new ParseUUIDPipe({version: '4'})) 
+  id: string) {
     return this.employeesService.remove(id);
-  }
+    }
 }
