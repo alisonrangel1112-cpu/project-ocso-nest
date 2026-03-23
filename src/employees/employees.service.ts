@@ -5,25 +5,27 @@ import { v4 as uuid } from "uuid";
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { identity } from 'rxjs';
+import { Employee } from './entities/employee.entity';
 
 @Injectable()
 export class EmployeesService {
-constructor()
-@InjectRepository(Employee)
-private  employeeRepository: Repository<Employee>;
-}{}
 
-  async create(createEmployeeDto: CreateEmployeeDto) {
-  const employee = await this.employeeRepository.save(CreateEmployeeDto)
-  return Employee;
+constructor(
+@InjectRepository(Employee)
+private  employeeRepository: Repository<Employee>
+){}
+
+  async create (createEmployeeDto: CreateEmployeeDto) {
+  const employee = await this.employeeRepository.save(createEmployeeDto)
+  return employee;
   }
 
   findAll() {
     return this.employeeRepository.find();
   }
 
-  findOne(id: string) {
-    const employee = this.employeeRepository.findOneBy({
+  async findOne(id: string) {
+    const employee = await this.employeeRepository.findOneBy({
       employeeId: id
     })
     return employee;
@@ -32,9 +34,12 @@ private  employeeRepository: Repository<Employee>;
   async update(id: string, updateEmployeeDto: UpdateEmployeeDto) {
   const employeeToUpdate = await this.employeeRepository.preload({
   employeeId: id,
-  ...UpdateEmployeeDto
-  })
-  this.employeeRepository.save(employeeToUpdate)
+  ...updateEmployeeDto
+  });
+
+  if (!employeeToUpdate) throw new NotFoundException('Employee #${id} not found');
+
+  await this.employeeRepository.save(employeeToUpdate)
   return employeeToUpdate;
   }
   
@@ -47,4 +52,4 @@ private  employeeRepository: Repository<Employee>;
     message: 'Employee deleted'
    }
   }
-w
+}

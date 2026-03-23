@@ -3,6 +3,8 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import {v4 as uuid } from 'uuid';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Product } from './entities/product.entity';
 
 
 @Injectable()
@@ -11,11 +13,9 @@ export class ProductsService {
     @InjectRepository(Product)
     private productRepository: Repository<Product>
   ){}
-  private products: CreateProductDto[] = [...
- ]
-  create(createProductDto: CreateProductDto) {
+  async create(createProductDto: CreateProductDto) {
    const product = this.productRepository.create(createProductDto)
-   const savedProduct = this.productRepository.save(product);
+   const savedProduct = await this.productRepository.save(product);
    return savedProduct;
 
   }
@@ -32,13 +32,15 @@ export class ProductsService {
   return product;
  }
 
-  findByProvider(id: string){
-  const productsFound = this.products.filter((product) => product.provider === id)
+  async findByProvider(id: string){
+  const productsFound = await this.productRepository.find({
+    where: { product:  id  }
+  });
   if (productsFound.length === 0) throw new NotFoundException()
     return productsFound;
   }
 
-  update(id: string, updateProductDto: UpdateProductDto) {
+  async update(id: string, updateProductDto: UpdateProductDto) {
    const productToUpdate = await this.productRepository.preload({
     productId: id,
     ...updateProductDto
@@ -47,13 +49,15 @@ export class ProductsService {
   this.productRepository.save(productToUpdate)
   return productToUpdate;
   }
+async remove(id: string) {
+    const result = await this.productRepository.delete(id);
+    
+    if (result.affected === 0) {
+      throw new NotFoundException('Product with id ${id} not found');
+    }
 
-  async remove(id: string) {
-  return this.productRepository.Delete({
-    productId: id,
-  })
-  return {
-    message: 'objeto con el id ${id} eliminado'
-  }
+    return {
+      message: "Objeto con el id ${id} eliminado",
+    };
   }
 }

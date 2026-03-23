@@ -4,7 +4,9 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { EmployeesModule } from './employees/employees.module';
 import { ProductsModule } from './products/products.module';
-import { ConfigModule } from '@nest/config';
+import { ConfigModule } from '@nestjs/config';
+import { ProvidersModule } from './providers/providers.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -20,7 +22,7 @@ import { ConfigModule } from '@nest/config';
     autoLoadEntities: true,
     synchronize: true,
   }), 
-  EmployeesModule, ProductsModule],
+  EmployeesModule, ProductsModule, ProvidersModule, AuthModule],
   controllers: [AppController],
   providers: [AppService],
 })
